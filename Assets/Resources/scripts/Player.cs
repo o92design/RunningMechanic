@@ -5,9 +5,13 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
     public float speed;
-    public bool directionRight { get; set; }
+
+    public bool directionRight;
+    public bool sprinting;
 
     private float backingSpeed = 0.35F;
+    private float sprintSpeed = 1.35F;
+
 
 	// Use this for initialization
 	void Start ()
@@ -19,10 +23,14 @@ public class Player : MonoBehaviour {
 
     private void Update()
     {
-        Debug.Log(Input.GetKey(KeyCode.Joystick1Button0));
         if (Input.GetButtonDown("Turn"))
         {
             turnAround();
+        }
+
+        if(Input.GetButtonDown("Sprint"))
+        {
+            toggleSprint();
         }
     }
 
@@ -37,7 +45,9 @@ public class Player : MonoBehaviour {
         float speedDirection = 0;
         float backing = speed * backingSpeed;
 
-        speedDirection = directionRight ? (dir.x < 0 ? backing : speed) : (dir.x > 0 ? backing : speed);
+        float forwardSpeed = sprinting ? speed * sprintSpeed : speed;
+
+        speedDirection = directionRight ? (dir.x < 0 ? backing : forwardSpeed) : (dir.x > 0 ? backing : forwardSpeed);
 
         float currentSpeed = dir.x * speedDirection * Time.deltaTime;
         transform.Translate(Vector3.right * currentSpeed);
@@ -45,13 +55,17 @@ public class Player : MonoBehaviour {
         Debug.Log("CurSpeed: " + currentSpeed);
     }
 
+    private void toggleSprint()
+    {
+        sprinting = !sprinting;
+    }
 
     private void turnAround()
     {
         directionRight = !directionRight;
         // What will this do with animation? 
         Vector3 scale = transform.localScale;
-        scale.x = directionRight ? scale.x : scale.x * -1;
+        scale.x *= -1;
         transform.localScale = scale;
     }
 }
